@@ -4,7 +4,6 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/jesseduffield/lazygit/pkg/commands/git_commands"
 	"github.com/jesseduffield/lazygit/pkg/commands/models"
 	"github.com/jesseduffield/lazygit/pkg/gui/types"
 )
@@ -61,5 +60,19 @@ func (self *UpstreamHelper) PromptForUpstreamWithoutInitialContent(_ *models.Bra
 }
 
 func (self *UpstreamHelper) GetSuggestedRemote() string {
-	return git_commands.GetSuggestedRemoteName(self.c.Model().Remotes)
+	return getSuggestedRemote(self.c.Model().Remotes)
+}
+
+func getSuggestedRemote(remotes []*models.Remote) string {
+	if len(remotes) == 0 {
+		return "origin"
+	}
+
+	for _, remote := range remotes {
+		if remote.Name == "origin" {
+			return remote.Name
+		}
+	}
+
+	return remotes[0].Name
 }

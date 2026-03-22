@@ -378,20 +378,6 @@ func GetMainRemote(remotes []*gogit.Remote) *gogit.Remote {
 	})
 }
 
-func GetSuggestedRemoteName(remotes []*models.Remote) string {
-	if len(remotes) == 0 {
-		return "origin"
-	}
-
-	for _, remote := range remotes {
-		if remote.Name == "origin" {
-			return remote.Name
-		}
-	}
-
-	return remotes[0].Name
-}
-
 func (self *GitHubCommands) GetBaseRepoOwnerAndName() (string, string, error) {
 	remotes, err := self.repo.Remotes()
 	if err != nil {
