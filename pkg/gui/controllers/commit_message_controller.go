@@ -124,7 +124,7 @@ func (self *CommitMessageController) handleTogglePanel() error {
 		// switch to the description panel.
 		view := self.context().GetView()
 		for range 4 {
-			view.Editor.Edit(view, gocui.NewKeyRune(' '), 0)
+			view.Editor.Edit(view, gocui.NewKeyRune(' '))
 		}
 		return nil
 	}
