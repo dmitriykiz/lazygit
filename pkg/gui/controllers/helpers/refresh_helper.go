@@ -169,7 +169,7 @@ func (self *RefreshHelper) Refresh(options types.RefreshOptions) {
 		if scopeSet.Includes(types.FILES) || scopeSet.Includes(types.SUBMODULES) {
 			fileWg.Add(1)
 			refresh("files", func() {
-				_ = self.refreshFilesAndSubmodules()
+				_ = self.refreshFilesAndSubmodules(options.TakeOverUntrackedFilesFromPreviousModel)
 				fileWg.Done()
 			})
 		}
@@ -539,7 +539,7 @@ func (self *RefreshHelper) refreshBranches(refreshWorktrees bool, keepBranchSele
 	self.refreshStatus()
 }
 
-func (self *RefreshHelper) refreshFilesAndSubmodules() error {
+func (self *RefreshHelper) refreshFilesAndSubmodules(takeOverUntrackedFilesFromPreviousModel bool) error {
 	self.c.Mutexes().RefreshingFilesMutex.Lock()
 	self.c.State().SetIsRefreshingFiles(true)
 	defer func() {
@@ -551,7 +551,7 @@ func (self *RefreshHelper) refreshFilesAndSubmodules() error {
 		return err
 	}
 
-	if err := self.refreshStateFiles(); err != nil {
+	if err := self.refreshStateFiles(takeOverUntrackedFilesFromPreviousModel); err != nil {
 		return err
 	}
 
@@ -564,7 +564,7 @@ func (self *RefreshHelper) refreshFilesAndSubmodules() error {
 	return nil
 }
 
-func (self *RefreshHelper) refreshStateFiles() error {
+func (self *RefreshHelper) refreshStateFiles(takeOverUntrackedFilesFromPreviousModel bool) error {
 	fileTreeViewModel := self.c.Contexts().Files.FileTreeViewModel
 
 	prevConflictFileCount := 0
@@ -599,14 +599,26 @@ func (self *RefreshHelper) refreshStateFiles() error {
 		}
 	}
 
+	var previousUntrackedFiles []*models.File
+	if takeOverUntrackedFilesFromPreviousModel {
+		previousUntrackedFiles = lo.Filter(self.c.Model().Files,
+			func(file *models.File, _ int) bool { return file.ShortStatus == "??" })
+	}
+
 	showUntracked := git_commands.ShowUntrackedModeAuto
-	if self.c.Contexts().Files.ForceShowUntracked() {
+	if takeOverUntrackedFilesFromPreviousModel {
+		showUntracked = git_commands.ShowUntrackedModeOff
+	} else if self.c.Contexts().Files.ForceShowUntracked() {
 		showUntracked = git_commands.ShowUntrackedModeOn
 	}
 	files := self.c.Git().Loaders.FileLoader.
 		GetStatusFiles(git_commands.GetStatusFileOptions{
 			ShowUntracked: showUntracked,
 		})
+
+	if takeOverUntrackedFilesFromPreviousModel {
+		files = append(files, previousUntrackedFiles...)
+	}
 
 	conflictFileCount := 0
 	for _, file := range files {

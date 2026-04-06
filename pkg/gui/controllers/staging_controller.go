@@ -226,11 +226,16 @@ func (self *StagingController) DiscardSelection() error {
 }
 
 func (self *StagingController) applySelectionAndRefresh(reverse bool) error {
+	isTracked := self.c.Contexts().Files.GetSelectedFile().Tracked
+
 	if err := self.applySelection(reverse); err != nil {
 		return err
 	}
 
-	self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES, types.STAGING}})
+	self.c.Refresh(types.RefreshOptions{
+		Scope:                                   []types.RefreshableView{types.FILES, types.STAGING},
+		TakeOverUntrackedFilesFromPreviousModel: isTracked,
+	})
 	return nil
 }
 
@@ -281,11 +286,16 @@ func (self *StagingController) applySelection(reverse bool) error {
 }
 
 func (self *StagingController) EditHunkAndRefresh() error {
+	isTracked := self.c.Contexts().Files.GetSelectedFile().Tracked
+
 	if err := self.editHunk(); err != nil {
 		return err
 	}
 
-	self.c.Refresh(types.RefreshOptions{Scope: []types.RefreshableView{types.FILES, types.STAGING}})
+	self.c.Refresh(types.RefreshOptions{
+		Scope:                                   []types.RefreshableView{types.FILES, types.STAGING},
+		TakeOverUntrackedFilesFromPreviousModel: isTracked,
+	})
 	return nil
 }
 
