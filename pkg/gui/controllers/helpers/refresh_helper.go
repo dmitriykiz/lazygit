@@ -599,9 +599,13 @@ func (self *RefreshHelper) refreshStateFiles() error {
 		}
 	}
 
+	showUntracked := git_commands.ShowUntrackedModeAuto
+	if self.c.Contexts().Files.ForceShowUntracked() {
+		showUntracked = git_commands.ShowUntrackedModeOn
+	}
 	files := self.c.Git().Loaders.FileLoader.
 		GetStatusFiles(git_commands.GetStatusFileOptions{
-			ForceShowUntracked: self.c.Contexts().Files.ForceShowUntracked(),
+			ShowUntracked: showUntracked,
 		})
 
 	conflictFileCount := 0
