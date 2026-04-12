@@ -48,9 +48,12 @@ func main() {
 		return
 	}
 
-	// Detect if we're running inside a git repo; warn if not
+	// Detect if we're running inside a git repo; warn if not.
+	// Note: exit with a non-zero status code so shell scripts can detect this
+	// and avoid launching the TUI in a meaningless state.
 	if !env.IsInsideWorkTree() {
-		fmt.Fprintln(os.Stderr, "warning: not inside a git repository")
+		fmt.Fprintln(os.Stderr, "error: not inside a git repository")
+		os.Exit(1)
 	}
 
 	// Create and start the lazygit application
