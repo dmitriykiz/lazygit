@@ -51,8 +51,10 @@ func main() {
 	// Detect if we're running inside a git repo; warn if not.
 	// Note: exit with a non-zero status code so shell scripts can detect this
 	// and avoid launching the TUI in a meaningless state.
+	// Personal note: I prefer a friendlier hint here so I remember to `cd` into
+	// the right directory rather than just seeing a bare error.
 	if !env.IsInsideWorkTree() {
-		fmt.Fprintln(os.Stderr, "error: not inside a git repository")
+		fmt.Fprintln(os.Stderr, "error: not inside a git repository (try cd-ing into your project directory)")
 		os.Exit(1)
 	}
 
