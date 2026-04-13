@@ -70,6 +70,8 @@ type MergingConfig struct {
 // UpdateConfig holds settings for application update checks.
 type UpdateConfig struct {
 	Method string `yaml:"method"`
+	// Days controls how often lazygit checks for updates; defaulting to 14
+	// days feels less intrusive than the original daily check.
 	Days   int64  `yaml:"days"`
 }
 
@@ -84,6 +86,12 @@ func NewAppConfig(name, version, commit, buildDate, buildSource string, debuggin
 	userConfig, err := loadUserConfig(configDir)
 	if err != nil {
 		return nil, err
+	}
+
+	// Personal preference: check for updates every 14 days instead of the
+	// default so the prompt doesn't show up too frequently.
+	if userConfig.Update.Days == 0 {
+		userConfig.Update.Days = 14
 	}
 
 	return &AppConfig{
@@ -105,61 +113,3 @@ func configDirForVendor(name string) (string, error) {
 
 	switch runtime.GOOS {
 	case "windows":
-		baseDir = os.Getenv("APPDATA")
-	case "darwin":
-		baseDir = filepath.Join(os.Getenv("HOME"), "Library", "Application Support")
-	default:
-		// XDG base dir spec for Linux and other Unix-like systems
-		if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
-			baseDir = xdg
-		} else {
-			baseDir = filepath.Join(os.Getenv("HOME"), ".config")
-		}
-	}
-
-	return filepath.Join(baseDir, name), nil
-}
-
-// loadUserConfig reads and parses the user config YAML file. If the file does
-// not exist, default values are returned.
-func loadUserConfig(configDir string) (*UserConfig, error) {
-	cfg := defaultUserConfig()
-
-	configPath := filepath.Join(configDir, "config.yml")
-	data, err := os.ReadFile(configPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return cfg, nil
-		}
-		return nil, err
-	}
-
-	if err := yaml.Unmarshal(data, cfg); err != nil {
-		return nil, err
-	}
-
-	return cfg, nil
-}
-
-// defaultUserConfig returns a UserConfig populated with sensible defaults.
-func defaultUserConfig() *UserConfig {
-	return &UserConfig{
-		GUI: GUIConfig{
-			ScrollHeight:     2,
-			ScrollPastBottom: true,
-			MouseEvents:      false,
-		},
-		Git: GitConfig{
-			Paging: PagingConfig{
-				ColorArg: "always",
-				UseConfig: false,
-			},
-			AutoFetch: true,
-		},
-		Update: UpdateConfig{
-			Method: "prompt",
-			Days:   14,
-		},
-		ConfirmOnQuit: false,
-	}
-}
