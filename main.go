@@ -56,6 +56,10 @@ func main() {
 	if !env.IsInsideWorkTree() {
 		fmt.Fprintln(os.Stderr, "error: not inside a git repository (try cd-ing into your project directory)")
 		fmt.Fprintln(os.Stderr, "tip: run `git init` if you want to start a new repository here")
+		// Also print the current working directory to make it easier to see where we are
+		if cwd, err := os.Getwd(); err == nil {
+			fmt.Fprintf(os.Stderr, "current directory: %s\n", cwd)
+		}
 		os.Exit(1)
 	}
 
