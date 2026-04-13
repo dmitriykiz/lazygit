@@ -70,8 +70,9 @@ type MergingConfig struct {
 // UpdateConfig holds settings for application update checks.
 type UpdateConfig struct {
 	Method string `yaml:"method"`
-	// Days controls how often lazygit checks for updates. Bumped to 30 days
-	// for personal use — weekly/biweekly prompts felt too noisy in practice.
+	// Days controls how often lazygit checks for updates. Bumped to 60 days
+	// for personal use — even 30-day prompts feel too frequent when the tool
+	// is stable and working well.
 	Days   int64  `yaml:"days"`
 }
 
@@ -88,9 +89,9 @@ func NewAppConfig(name, version, commit, buildDate, buildSource string, debuggin
 		return nil, err
 	}
 
-	// Default to checking for updates every 30 days to keep things quiet.
+	// Default to checking for updates every 60 days to keep things quiet.
 	if userConfig.Update.Days == 0 {
-		userConfig.Update.Days = 30
+		userConfig.Update.Days = 60
 	}
 
 	return &AppConfig{
