@@ -70,6 +70,9 @@ func main() {
 	}
 
 	if err := lazyApp.Run(); err != nil {
+		// Personal preference: print the error to stderr as well so it's visible
+		// even if the terminal is in a weird state after the TUI exits.
+		fmt.Fprintf(os.Stderr, "lazygit exited with error: %v\n", err)
 		log.Fatalf("app exited with error: %v", err)
 	}
 }
