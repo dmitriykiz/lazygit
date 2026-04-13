@@ -73,6 +73,8 @@ func main() {
 		// Personal preference: print the error to stderr as well so it's visible
 		// even if the terminal is in a weird state after the TUI exits.
 		fmt.Fprintf(os.Stderr, "lazygit exited with error: %v\n", err)
-		log.Fatalf("app exited with error: %v", err)
+		// Use os.Exit instead of log.Fatalf to avoid printing a redundant
+		// timestamp prefix on the error we already printed above.
+		os.Exit(1)
 	}
 }
