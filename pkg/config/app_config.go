@@ -70,8 +70,8 @@ type MergingConfig struct {
 // UpdateConfig holds settings for application update checks.
 type UpdateConfig struct {
 	Method string `yaml:"method"`
-	// Days controls how often lazygit checks for updates; defaulting to 14
-	// days feels less intrusive than the original daily check.
+	// Days controls how often lazygit checks for updates. Bumped to 30 days
+	// for personal use — weekly/biweekly prompts felt too noisy in practice.
 	Days   int64  `yaml:"days"`
 }
 
@@ -88,10 +88,9 @@ func NewAppConfig(name, version, commit, buildDate, buildSource string, debuggin
 		return nil, err
 	}
 
-	// Personal preference: check for updates every 14 days instead of the
-	// default so the prompt doesn't show up too frequently.
+	// Default to checking for updates every 30 days to keep things quiet.
 	if userConfig.Update.Days == 0 {
-		userConfig.Update.Days = 14
+		userConfig.Update.Days = 30
 	}
 
 	return &AppConfig{
@@ -99,17 +98,4 @@ func NewAppConfig(name, version, commit, buildDate, buildSource string, debuggin
 		Version:     version,
 		Commit:      commit,
 		BuildDate:   buildDate,
-		Debug:       debuggingFlag,
-		BuildSource: buildSource,
-		UserConfig:  userConfig,
-		ConfigDir:   configDir,
-	}, nil
-}
-
-// configDirForVendor returns the OS-appropriate configuration directory for
-// the application.
-func configDirForVendor(name string) (string, error) {
-	var baseDir string
-
-	switch runtime.GOOS {
-	case "windows":
+		
