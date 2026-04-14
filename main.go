@@ -77,4 +77,9 @@ func main() {
 		// timestamp prefix on the error we already printed above.
 		os.Exit(1)
 	}
+
+	// Personal addition: print a small goodbye message on clean exit so I know
+	// the TUI shut down normally (helpful when running in a tmux pane that
+	// closes immediately after lazygit exits).
+	fmt.Fprintln(os.Stderr, "lazygit exited cleanly")
 }
