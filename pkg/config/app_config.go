@@ -26,7 +26,7 @@ type UserConfig struct {
 	GUI          GUIConfig    `yaml:"gui"`
 	Git          GitConfig    `yaml:"git"`
 	Update       UpdateConfig `yaml:"update"`
-	ConfirmOnQuit bool        `yaml:"confirmOnQuit"`
+	ConfirmOnQuitQuit"`
 }
 
 // GUIConfig holds settings related to the graphical user interface.
@@ -70,9 +70,9 @@ type MergingConfig struct {
 // UpdateConfig holds settings for application update checks.
 type UpdateConfig struct {
 	Method string `yaml:"method"`
-	// Days controls how often lazygit checks for updates. Bumped to 60 days
-	// for personal use — even 30-day prompts feel too frequent when the tool
-	// is stable and working well.
+	// Days controls how often lazygit checks for updates. Bumped to 90 days
+	// for personal use — I only want to hear about updates occasionally, and
+	// I'll check the releases page manually when I care.
 	Days   int64  `yaml:"days"`
 }
 
@@ -89,9 +89,9 @@ func NewAppConfig(name, version, commit, buildDate, buildSource string, debuggin
 		return nil, err
 	}
 
-	// Default to checking for updates every 60 days to keep things quiet.
+	// Default to checking for updates every 90 days to keep things quiet.
 	if userConfig.Update.Days == 0 {
-		userConfig.Update.Days = 60
+		userConfig.Update.Days = 90
 	}
 
 	return &AppConfig{
