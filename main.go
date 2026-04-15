@@ -78,8 +78,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Personal addition: print a small goodbye message on clean exit so I know
-	// the TUI shut down normally (helpful when running in a tmux pane that
-	// closes immediately after lazygit exits).
-	fmt.Fprintln(os.Stderr, "lazygit exited cleanly")
+	// Personal addition: only print the goodbye message when stdout is a terminal
+	// (i.e. not when piped/redirected), so it doesn't pollute script output.
+	if fi, err := os.Stderr.Stat(); err == nil && (fi.Mode()&os.ModeCharDevice) != 0 {
+		fmt.Fprintln(os.Stderr, "lazygit exited cleanly")
+	}
 }
