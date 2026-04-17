@@ -78,9 +78,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Personal addition: only print the goodbye message when stdout is a terminal
-	// (i.e. not when piped/redirected), so it doesn't pollute script output.
-	if fi, err := os.Stderr.Stat(); err == nil && (fi.Mode()&os.ModeCharDevice) != 0 {
-		fmt.Fprintln(os.Stderr, "lazygit exited cleanly")
-	}
+	// Personal note: removed the "lazygit exited cleanly" message - I found it
+	// annoying to see this every time even on a terminal. Silence is success.
 }
