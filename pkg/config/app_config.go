@@ -26,32 +26,32 @@ type UserConfig struct {
 	GUI          GUIConfig    `yaml:"gui"`
 	Git          GitConfig    `yaml:"git"`
 	Update       UpdateConfig `yaml:"update"`
-	ConfirmOnQuitQuit"`
+	ConfirmOnQuit bool        `yaml:"confirmOnQuit"`
 }
 
 // GUIConfig holds settings related to the graphical user interface.
 type GUIConfig struct {
-	ScrollHeight       int    `yaml:"scrollHeight"`
-	ScrollPastBottom   bool   `yaml:"scrollPastBottom"`
-	MouseEvents        bool   `yaml:"mouseEvents"`
-	SkipUnstageLineWarning bool `yaml:"skipUnstageLineWarning"`
-	Theme              ThemeConfig `yaml:"theme"`
+	ScrollHeight            int         `yaml:"scrollHeight"`
+	ScrollPastBottom        bool        `yaml:"scrollPastBottom"`
+	MouseEvents             bool        `yaml:"mouseEvents"`
+	SkipUnstageLineWarning  bool        `yaml:"skipUnstageLineWarning"`
+	Theme                   ThemeConfig `yaml:"theme"`
 }
 
 // ThemeConfig holds color and style theme settings.
 type ThemeConfig struct {
-	LightTheme        bool   `yaml:"lightTheme"`
-	ActiveBorderColor string `yaml:"activeBorderColor"`
+	LightTheme          bool   `yaml:"lightTheme"`
+	ActiveBorderColor   string `yaml:"activeBorderColor"`
 	InactiveBorderColor string `yaml:"inactiveBorderColor"`
-	OptionsTextColor  string `yaml:"optionsTextColor"`
+	OptionsTextColor    string `yaml:"optionsTextColor"`
 }
 
 // GitConfig holds git-related settings.
 type GitConfig struct {
-	Paging          PagingConfig `yaml:"paging"`
-	Merging         MergingConfig `yaml:"merging"`
-	SkipHookPrefix  string       `yaml:"skipHookPrefix"`
-	AutoFetch       bool         `yaml:"autoFetch"`
+	Paging         PagingConfig  `yaml:"paging"`
+	Merging        MergingConfig `yaml:"merging"`
+	SkipHookPrefix string        `yaml:"skipHookPrefix"`
+	AutoFetch      bool          `yaml:"autoFetch"`
 }
 
 // PagingConfig holds settings for paging/diff output.
@@ -94,9 +94,13 @@ func NewAppConfig(name, version, commit, buildDate, buildSource string, debuggin
 		userConfig.Update.Days = 90
 	}
 
+	// Default mouse events to enabled — I find it useful for scrolling panels.
+	if !userConfig.GUI.MouseEvents {
+		userConfig.GUI.MouseEvents = true
+	}
+
 	return &AppConfig{
 		Name:        name,
 		Version:     version,
 		Commit:      commit,
 		BuildDate:   buildDate,
-		
